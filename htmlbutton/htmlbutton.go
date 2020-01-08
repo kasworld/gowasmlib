@@ -1,4 +1,4 @@
-// Copyright 2015,2016,2017,2018,2019 SeukWon Kang (kasworld@gmail.com)
+// Copyright 2014,2015,2016,2017,2018,2019,2020 SeukWon Kang (kasworld@gmail.com)
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,8 +16,6 @@ import (
 	"bytes"
 	"fmt"
 	"syscall/js"
-
-	"github.com/kasworld/gowasmlib/jslog"
 )
 
 type HTMLButton struct {
@@ -66,21 +64,39 @@ func (v *HTMLButton) Disable() {
 	btn.Set("disabled", true)
 }
 
-type HTMLButtonGroup []*HTMLButton
-
-func (hbl HTMLButtonGroup) GetByIDBase(idb string) *HTMLButton {
-	for _, v := range hbl {
-		if v.IDBase == idb {
-			return v
-		}
-	}
-	jslog.Errorf("not found %v in %v", idb, hbl)
-	return nil
+type HTMLButtonGroup struct {
+	Name           string
+	ButtonList     []*HTMLButton
+	ID2Button      map[string]*HTMLButton
+	KeyCode2Button map[string]*HTMLButton
 }
 
-func (hbl HTMLButtonGroup) MakeHTML(obj interface{}) string {
+func NewButtonGroup(name string, buttons []*HTMLButton) *HTMLButtonGroup {
+	rtn := &HTMLButtonGroup{
+		Name:           name,
+		ButtonList:     buttons,
+		ID2Button:      make(map[string]*HTMLButton),
+		KeyCode2Button: make(map[string]*HTMLButton),
+	}
+	for _, v := range buttons {
+		rtn.ID2Button[v.IDBase] = v
+		rtn.KeyCode2Button[v.KeyCode] = v
+	}
+	return rtn
+}
+
+func (hbl *HTMLButtonGroup) GetByIDBase(idb string) *HTMLButton {
+	return hbl.ID2Button[idb]
+}
+
+func (hbl *HTMLButtonGroup) GetByKeyCode(kcode string) *HTMLButton {
+	return hbl.ID2Button[kcode]
+}
+
+func (hbl *HTMLButtonGroup) MakeHTML(obj interface{}) string {
 	var buf bytes.Buffer
-	for _, v := range hbl {
+	fmt.Fprintf(&buf, "%v:", hbl.Name)
+	for _, v := range hbl.ButtonList {
 		js.Global().Set(v.JSFnName(), js.FuncOf(v.MakeJSFn(obj)))
 		buf.WriteString(v.MakeHTML())
 	}
