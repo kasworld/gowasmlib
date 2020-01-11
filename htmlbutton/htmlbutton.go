@@ -38,7 +38,7 @@ func (v *HTMLButton) MakeJSFn(obj interface{}) func(this js.Value, args []js.Val
 	return func(this js.Value, args []js.Value) interface{} {
 		v.State++
 		v.State %= len(v.ButtonText)
-		btnStr := v.ButtonText[v.State]
+		btnStr := fmt.Sprintf("%s(%s)", v.ButtonText[v.State], v.KeyCode)
 		js.Global().Get("document").Call("getElementById", v.JSID()).Set("innerHTML", btnStr)
 		if v.ClickFn != nil {
 			v.ClickFn(obj, v)
@@ -47,7 +47,7 @@ func (v *HTMLButton) MakeJSFn(obj interface{}) func(this js.Value, args []js.Val
 	}
 }
 func (v HTMLButton) MakeHTML() string {
-	btnStr := v.ButtonText[v.State]
+	btnStr := fmt.Sprintf("%s(%s)", v.ButtonText[v.State], v.KeyCode)
 	return fmt.Sprintf(
 		`<button id="%v" onclick="%v()">%s</button> `,
 		v.JSID(), v.JSFnName(), btnStr,
@@ -90,7 +90,7 @@ func (hbl *HTMLButtonGroup) GetByIDBase(idb string) *HTMLButton {
 }
 
 func (hbl *HTMLButtonGroup) GetByKeyCode(kcode string) *HTMLButton {
-	return hbl.ID2Button[kcode]
+	return hbl.KeyCode2Button[kcode]
 }
 
 func (hbl *HTMLButtonGroup) MakeHTML(obj interface{}) string {
