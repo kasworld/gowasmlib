@@ -64,6 +64,20 @@ func (v *HTMLButton) Disable() {
 	btn.Set("disabled", true)
 }
 
+func (v *HTMLButton) Show() {
+	btn := js.Global().Get("document").Call("getElementById", v.JSID())
+	btn.Get("style").Set("display", "initial")
+}
+
+func (v *HTMLButton) Hide() {
+	btn := js.Global().Get("document").Call("getElementById", v.JSID())
+	btn.Get("style").Set("display", "none")
+}
+
+func (v *HTMLButton) Register(obj interface{}) {
+	js.Global().Set(v.JSFnName(), js.FuncOf(v.MakeJSFn(obj)))
+}
+
 type HTMLButtonGroup struct {
 	Name           string
 	ButtonList     []*HTMLButton
@@ -97,7 +111,7 @@ func (hbl *HTMLButtonGroup) MakeHTML(obj interface{}) string {
 	var buf bytes.Buffer
 	fmt.Fprintf(&buf, "%v:", hbl.Name)
 	for _, v := range hbl.ButtonList {
-		js.Global().Set(v.JSFnName(), js.FuncOf(v.MakeJSFn(obj)))
+		v.Register(obj)
 		buf.WriteString(v.MakeHTML())
 	}
 	return buf.String()
