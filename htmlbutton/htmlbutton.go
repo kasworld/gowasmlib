@@ -107,11 +107,16 @@ func (hbl *HTMLButtonGroup) GetByKeyCode(kcode string) *HTMLButton {
 	return hbl.KeyCode2Button[kcode]
 }
 
-func (hbl *HTMLButtonGroup) MakeHTML(obj interface{}) string {
-	var buf bytes.Buffer
-	fmt.Fprintf(&buf, "%v:", hbl.Name)
+func (hbl *HTMLButtonGroup) Register(obj interface{}) {
 	for _, v := range hbl.ButtonList {
 		v.Register(obj)
+	}
+}
+
+func (hbl *HTMLButtonGroup) MakeHTML(obj interface{}) string {
+	var buf bytes.Buffer
+	fmt.Fprintf(&buf, "%v", hbl.Name)
+	for _, v := range hbl.ButtonList {
 		buf.WriteString(v.MakeHTML())
 	}
 	return buf.String()
