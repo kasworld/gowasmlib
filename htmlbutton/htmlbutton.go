@@ -49,7 +49,7 @@ func (v *HTMLButton) MakeJSFn(obj interface{}) func(this js.Value, args []js.Val
 func (v HTMLButton) MakeHTML() string {
 	btnStr := fmt.Sprintf("%s(%s)", v.ButtonText[v.State], v.KeyCode)
 	return fmt.Sprintf(
-		`<button id="%v" title="%v" onclick="%v()">%s</button> `,
+		`<button id="%v" title="%v" onclick="%v()">%s</button>`,
 		v.JSID(), v.ToolTip, v.JSFnName(), btnStr,
 	)
 }
